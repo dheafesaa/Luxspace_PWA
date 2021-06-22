@@ -6,9 +6,15 @@ import Arrived from "./component/Arrived";
 import Clients from "./component/Clients";
 import ASideMenu from "./component/ASideMenu";
 import Footer from "./component/Footer";
+import Offline from "./component/Offline";
 
 function App() {
   const [items, setItems] = useState([]);
+  const [offLineStatus, setOffLineStatus] = useState(!navigator.onLine);
+
+  function handleOffLineStatus() {
+    setOffLineStatus(!navigator.onLine);
+  }
 
   useEffect(function () {
     (async function () {
@@ -24,10 +30,25 @@ function App() {
       );
       const { nodes } = await response.json();
       setItems(nodes);
+
+      const script = document.createElement("script");
+      script.src = "/carousel.js";
+      script.async = false;
+      document.body.appendChild(script);
     })();
-  }, []);
+
+    handleOffLineStatus();
+    window.addEventListener('online', handleOffLineStatus);
+    window.addEventListener('offline', handleOffLineStatus);
+
+    return function () {
+      window.removeEventListener('online', handleOffLineStatus);
+      window.removeEventListener('offline', handleOffLineStatus);
+    }
+  }, [offLineStatus]);
   return (
     <>
+    { offLineStatus && <Offline /> }
       <Header />
       <Hero />
       <Browse />
