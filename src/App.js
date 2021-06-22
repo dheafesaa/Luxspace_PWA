@@ -7,10 +7,12 @@ import Clients from "./component/Clients";
 import ASideMenu from "./component/ASideMenu";
 import Footer from "./component/Footer";
 import Offline from "./component/Offline";
+import Splash from "./pages/Splash";
 
 function App() {
   const [items, setItems] = useState([]);
   const [offLineStatus, setOffLineStatus] = useState(!navigator.onLine);
+  const [isLoading, setIsLoading] = useState(true);
 
   function handleOffLineStatus() {
     setOffLineStatus(!navigator.onLine);
@@ -41,6 +43,10 @@ function App() {
     window.addEventListener('online', handleOffLineStatus);
     window.addEventListener('offline', handleOffLineStatus);
 
+    setTimeout (function() {
+      setIsLoading(false);
+    }, 1500);
+
     return function () {
       window.removeEventListener('online', handleOffLineStatus);
       window.removeEventListener('offline', handleOffLineStatus);
@@ -48,7 +54,10 @@ function App() {
   }, [offLineStatus]);
   return (
     <>
-    { offLineStatus && <Offline /> }
+    {isLoading === true ? <Splash /> :
+    (
+      <>
+      { offLineStatus && <Offline /> }
       <Header />
       <Hero />
       <Browse />
@@ -56,6 +65,10 @@ function App() {
       <Clients />
       <ASideMenu />
       <Footer />
+      </>
+    ) 
+    }
+    
     </>
   );
 }
